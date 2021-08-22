@@ -1,75 +1,51 @@
-<?php   
-        $productCollection = $block->getLoadedProductCollection();
-        $productCollection->clear();
-        $productCollection->addStoreFilter();
-        $productCollection->getSelect()->distinct()->reset('order')->orderRand()->limit(3, 0);
-        $sql = $productCollection->getSelect()->__toString();
-        echo $sql;
-?>
-<div class="block block-custom-sidebar" data-role="custom-products-sidebar">
+<div id="talexan-random-three-product" class="block block-custom-sidebar" data-bind="scope: 'customSidebar'" data-role="custom-products-sidebar" data-category-id="<?= $block->prepareDataCategoryId() ?>" >
     <div class="block-title" style="padding-bottom: 20px;">
         <strong id="block-custom-sidebar-heading" role="heading" aria-level="2"><?= $block->escapeHtml(__('Custom Sidebar')) ?></strong>
     </div>
-    <?php if (!$productCollection->count()):?>
-    <div class="message info empty">
-        <div><?= $block->escapeHtml(__('We can\'t find products matching the selection.')) ?></div>
-    </div>
-<?php else:?>
-<?php 
-    if ($block->getMode() == 'grid') {
-        $viewMode = 'grid';
-        $imageDisplayArea = 'category_page_grid';
-        $showDescription = false;
-        $templateType = \Magento\Catalog\Block\Product\ReviewRendererInterface::SHORT_VIEW;
-    } else {
-        $viewMode = 'list';
-        $imageDisplayArea = 'category_page_list';
-        $showDescription = true;
-        $templateType = \Magento\Catalog\Block\Product\ReviewRendererInterface::FULL_VIEW;
-    }
-/**
- * Position for actions regarding image size changing in vde if needed
- */
-    $pos = $block->getPositioned();
-?>
-    <div class="talexan-custom-sidebar">
-        <ul id="sidebar-items" class="product-items"><?php foreach ($productCollection as $product): ?> 
+<!-- ko if: customSidebar().count -->
+    <div class="talexan-custom-sidebar" data-bind="css: {'no-display': !customSidebar().count}">
+        <ul id="sidebar-items" class="product-items" data-bind="foreach: customSidebar().items">
             <li class="product-item">
                 <div style="height: 72px; clear: all;">
-                    <div class="container-product-photo" style="float: left; margin: 2px; height: 64px;">
-                    <?php 
-                        $productImage = $block->getImage($product, $imageDisplayArea);
-                    ?>
-                        <a href="<?= $block->escapeUrl($product->getProductUrl()) ?>"
-                            class="product photo product-item-photo" tabindex="-1">
-                            <span class="product-image-container" style="width: 52px; height: 68px;">
-                               <span class="product-image-wrapper" style="padding: 2px; height: 68px;">
-                                    <img class="photo image <?= $block->escapeHtmlAttr($productImage->getClass()) ?>"
-                                        src="<?= $block->escapeUrl($productImage->getImageUrl()) ?>"
+                    <div class="container-product-photo" data-bind="style: {'float': 'left', 'margin': '2px', 'height': '64px'}">
+                        <a href="#" class="product-item-photo" data-bind="attr: {href: href}">
+                            <span class="product-image-container">
+                                <img data-bind="attr: {class: classImg, src: src, alt: labelImg}"
+                                        src="#"
                                         loading="lazy" width="48" height="64"
-                                        alt="<?= $block->escapeHtmlAttr($productImage->getLabel()) ?>" />
-                                </span>
+                                        alt="" />
                             </span>
                         </a>
                     </div>
-                    <div class="product details product-item-details">
-                        <?php
-                            $productNameStripped = $block->stripTags($product->getName(), null, true);
-                        ?>
+                    <div class="product details product-item-details random3-margin">
                         <strong class="product name product-item-name">
                             <a class="product-item-link"
-                               href="<?= $block->escapeUrl($product->getProductUrl()) ?>">
-                                <?=/* @noEscape */ $block->getData('outputHelper')->productAttribute($product, $product->getName(), 'name')?>
-                            </a>
+                               href="#" data-bind="attr: {href: href}, text: name"></a>
                         </strong>
                         <div class="price-box price-final_price" data-role="priceBox" >
-                            <span class="price"><?= /* @noEscape */ $block->getProductPrice($product) /*$block->escapeHtml($product->getFinalPrice())*/ ?></span>
+                            <span class="price" data-bind="html: price"></span>
                         </div>
                     </div>
                 </div>
             </li>
-            <?php endforeach; ?>
         </ul>
     </div>
-    <?php endif; ?>
+<!-- /ko -->
+<!-- ko ifnot: customSidebar().count -->
+    <div class="empty"><?= $block->escapeHtml(__('Wait...')) ?></div>
+<!-- /ko -->
 </div>
+<script type="text/x-magento-init">
+    {
+        "[data-role=custom-products-sidebar]": {
+            "Magento_Ui/js/core/app": {
+                "components": {
+                    "customSidebar": {
+                        "component": "Talexan_Random3\/js\/custom-sidebar"
+                    }
+                }
+            }
+        }
+
+    }
+</script>
